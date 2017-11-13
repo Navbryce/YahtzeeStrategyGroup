@@ -30,7 +30,7 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 		ArrayList<Straight> straights = checkForStraight(dice);
 		Straight maxStraight=null;
 		for(Straight straight: straights){
-			if(maxStraight==null || maxStraight.getSize()>maxStraight.getSize()){
+			if(maxStraight==null || straight.getSize()>maxStraight.getSize()){
 				maxStraight=straight;
 			}
 		}
