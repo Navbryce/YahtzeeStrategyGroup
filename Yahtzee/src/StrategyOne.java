@@ -64,7 +64,6 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 			}else{ //Must have been called because two straights with size of 2
 				ArrayList<Straight> straightsBySizeList = straightsMap.get(2);
 				for(int straightCounter=0; straightCounter<straightsBySizeList.size(); straightCounter++){
-					System.out.println("test");
 					Straight straight = straightsBySizeList.get(straightCounter);
 					reroll=keepRangeOfValues(reroll, straight.getStraightStartingIndex(), straight.getSize());
 				}
