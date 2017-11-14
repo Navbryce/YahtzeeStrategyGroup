@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class StrategyOne extends YahtzeeComputerStrategy{
 	private final int[] combinationMaxScores = {5,10,15,20,25,30,30,30,25,30,40,50,30};
@@ -28,8 +29,22 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 		}
 		
 		ArrayList<Straight> straights = checkForStraight(dice);
+		HashMap<Integer, Integer> straightSizesMap = new HashMap();
+		for(int possibleStraightSizes=0; possibleStraightSizes<=5; possibleStraightSizes++){ //Initializes the map
+			straightSizesMap.put(possibleStraightSizes, 0); 
+		}
+		HashMap<Integer, ArrayList<Straight>> straightsMap = new HashMap();
+
 		Straight maxStraight=null;
 		for(Straight straight: straights){
+			straightSizesMap.put(straight.getSize(), straightSizesMap.get(straight.getSize())+1);
+			ArrayList<Straight >straightsListBySize=straightsMap.get(straight.getSize());
+			if(straightsListBySize==null){
+				straightsListBySize=new ArrayList();
+			}
+			straightsListBySize.add(straight);
+			straightsMap.put(straight.getSize(), straightsListBySize);
+			
 			if(maxStraight==null || straight.getSize()>maxStraight.getSize()){
 				maxStraight=straight;
 			}
@@ -43,8 +58,17 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 				int index = indexes.get(i); //Index of the die value (the number on the die)
 				reroll=keepValueOfDie(reroll, dice, index+1); //index translated down by 1
 			}
-		}else if((nameToAvailable(record.availableCombinations(), "LargeStraightCombination")!=-1 || nameToAvailable(record.availableCombinations(), "SmallStraightCombination")!=-1) && maxStraight.getSize()>3){
-			reroll=keepRangeOfValues(reroll, maxStraight.getStraightStartingIndex(), maxStraight.getSize());
+		}else if((nameToAvailable(record.availableCombinations(), "LargeStraightCombination")!=-1 || nameToAvailable(record.availableCombinations(), "SmallStraightCombination")!=-1) && (maxStraight.getSize()>3 || straightSizesMap.get(2)>=2)){
+			if(maxStraight.getSize()>3){
+				reroll=keepRangeOfValues(reroll, maxStraight.getStraightStartingIndex(), maxStraight.getSize());
+			}else{ //Must have been called because two straights with size of 2
+				ArrayList<Straight> straightsBySizeList = straightsMap.get(2);
+				for(int straightCounter=0; straightCounter<straightsBySizeList.size(); straightCounter++){
+					System.out.println("test");
+					Straight straight = straightsBySizeList.get(straightCounter);
+					reroll=keepRangeOfValues(reroll, straight.getStraightStartingIndex(), straight.getSize());
+				}
+			}
 		}else{
 			int maxPossibleScore=-1;
 			int dieValue=-1; //The number of circles on the face of the die
