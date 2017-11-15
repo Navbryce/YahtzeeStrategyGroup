@@ -58,15 +58,14 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 				int index = indexes.get(i); //Index of the die value (the number on the die)
 				reroll=keepValueOfDie(reroll, dice, index+1); //index translated down by 1
 			}
-		}else if((nameToAvailable(record.availableCombinations(), "LargeStraightCombination")!=-1 || nameToAvailable(record.availableCombinations(), "SmallStraightCombination")!=-1) && (maxStraight.getSize()>3 || straightSizesMap.get(2)>=2)){
-			if(maxStraight.getSize()>3){
-				reroll=keepRangeOfValues(reroll, maxStraight.getStraightStartingIndex(), maxStraight.getSize());
-			}else{ //Must have been called because two straights with size of 2
-				ArrayList<Straight> straightsBySizeList = straightsMap.get(2);
-				for(int straightCounter=0; straightCounter<straightsBySizeList.size(); straightCounter++){
-					Straight straight = straightsBySizeList.get(straightCounter);
-					reroll=keepRangeOfValues(reroll, straight.getStraightStartingIndex(), straight.getSize());
-				}
+		}else if((nameToAvailable(record.availableCombinations(), "LargeStraightCombination")!=-1 || nameToAvailable(record.availableCombinations(), "SmallStraightCombination")!=-1) && (maxStraight.getSize()>3)){
+			reroll=keepRangeOfValues(reroll, maxStraight.getStraightStartingIndex(), maxStraight.getSize());
+		}else if(record.availableCombinations().length<3 && (nameToAvailable(record.availableCombinations(), "LargeStraightCombination")!=-1 || nameToAvailable(record.availableCombinations(), "SmallStraightCombination")!=-1) && (straightSizesMap.get(2)>2)){
+			//Must have been called because two straights with size of 2
+			ArrayList<Straight> straightsBySizeList = straightsMap.get(2);
+			for(int straightCounter=0; straightCounter<straightsBySizeList.size(); straightCounter++){
+				Straight straight = straightsBySizeList.get(straightCounter);
+				reroll=keepRangeOfValues(reroll, straight.getStraightStartingIndex(), straight.getSize());
 			}
 		}else{
 			int maxPossibleScore=-1;
