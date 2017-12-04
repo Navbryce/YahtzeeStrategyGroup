@@ -58,7 +58,7 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 				int index = indexes.get(i); //Index of the die value (the number on the die)
 				reroll=keepValueOfDie(reroll, dice, index+1); //index translated down by 1
 			}
-		}else if((nameToAvailable(record.availableCombinations(), "LargeStraightCombination")!=-1 || nameToAvailable(record.availableCombinations(), "SmallStraightCombination")!=-1) && (maxStraight.getSize()>3)){
+		}else if((nameToAvailable(record.availableCombinations(), "LargeStraightCombination")!=-1 || nameToAvailable(record.availableCombinations(), "SmallStraightCombination")!=-1) && (maxStraight.getSize()>2)){
 			reroll=keepRangeOfValues(reroll, maxStraight.getStraightStartingIndex(), maxStraight.getSize());
 		}else if(record.availableCombinations().length<3 && (nameToAvailable(record.availableCombinations(), "LargeStraightCombination")!=-1 || nameToAvailable(record.availableCombinations(), "SmallStraightCombination")!=-1) && (straightSizesMap.get(2)>2)){
 			//Must have been called because two straights with size of 2
@@ -83,10 +83,10 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 		//System.out.println("Roll number: "+rollNumber);
 		int diceCounter=0;
 		for(boolean roll: reroll){
-			//System.out.println("REROLL: " + roll + " - Die: " + dice[diceCounter]);
+			System.out.println("REROLL: " + roll + " - Die: " + dice[diceCounter]);
 			diceCounter++;
 		}
-		//System.out.println();
+		System.out.println();
 		
 	}
 	private boolean[] keepValueOfDie(boolean[] reroll, int[] dice, int dieFaceValue){
@@ -110,11 +110,19 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 		int selectedIndex=-1;
 		int maxValueIndex=-1;
 		int maxValue=-1;
+		int maxUpperSectionScore=-1;
+		int maxUpperSectionIndex=-1;
+		int bestUpperSectionRatio=-1;
+		int bestUpperSectionIndex=-1;
 		int maxRatioIndex=-1;
+		int amountNeededForBonus=63-record.upperSectionScore();
+		
 		for(int combinationIndex=0;combinationIndex<scoreCombinations.length;combinationIndex++){
 			if(scoreCombinations[combinationIndex]!= null){
 				//System.out.println("Index:"+combinationIndex + "  Score:"+scoreCombinations[combinationIndex].score(dice));
 				double scoreRatio = ((double)scoreCombinations[combinationIndex].score(dice))/((double)combinationMaxScores[combinationIndex]);
+				AbstractYahtzeeCombination combination = scoreCombinations[combinationIndex];
+				int score = combination.score(dice);
 				//System.out.println("Combination " + combinationIndex + ":" + scoreRatio);
 				if(scoreRatio>maxRatio){
 					maxRatio = scoreRatio;
@@ -124,13 +132,22 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 					maxValue=scoreCombinations[combinationIndex].score(dice);
 					maxValueIndex=combinationIndex;
 				}
+				if(combinationIndex<=5 && scoreCombinations[combinationIndex].score(dice)>maxUpperSectionScore){
+					maxUpperSectionScore=scoreCombinations[combinationIndex].score(dice);
+					maxUpperSectionIndex=combinationIndex;
+				}
+				if(score>=amountNeededForBonus && scoreRatio>bestUpperSectionRatio){
+					bestUpperSectionIndex=combinationIndex;
+				}
 			}
 		}
 		if(maxValue>=30){
 			selectedIndex=maxValueIndex;
 			//System.out.println("SELECTED MAX VALUE");
 
-		}else if(maxRatio<=.3){
+		}else if(amountNeededForBonus>0 && maxUpperSectionScore>=amountNeededForBonus){
+			selectedIndex=maxUpperSectionIndex;
+		}else if(maxRatio<=.3 || (maxRatio<=.2 && maxValueIndex==12)){
 			boolean selectedIndexBoolean=false;
 			for(int combinationIndex=0;combinationIndex<scoreCombinations.length && !selectedIndexBoolean;combinationIndex++){
 				try{
@@ -140,7 +157,7 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 						selectedIndex=combinationIndex;
 						selectedIndexBoolean=true;
 					}
-				}catch(Exception ex){
+					}catch(Exception ex){
 					
 				}
 			}
@@ -151,7 +168,8 @@ public class StrategyOne extends YahtzeeComputerStrategy{
 			//System.out.println("SELECTED MAX RATIO");
 		}
 		selectedIndex = rawToAvailable(record.availableCombinations(), scoreCombinations[selectedIndex]);
-		//System.out.println("Selected Index: " + selectedIndex +"--Score: " + record.availableCombinations()[selectedIndex] + " Name: ");
+		System.out.println("Selected Index: " + selectedIndex +"--Score: " + record.availableCombinations()[selectedIndex] + " Name: ");
+		System.out.println();
 		return selectedIndex;
 
 	}
