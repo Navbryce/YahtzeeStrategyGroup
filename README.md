@@ -1,5 +1,5 @@
 # YahtzeeStrategyGroup
-** Note: *bplunk0244* is *navbryce* **  
+**Note: _bplunk0244_ is _navbryce_ **
 Several Yahztee strategies can be found in this repository. One of these strategies aims to solve yahtzee through "scenario-based" reactions ("I have these cards, so I should do this"); *StrategyOne.java*. Another strategy attempts to use probabilities and brute force to solve the problem; *ProbabilityStrategy.java*. Every possible outcome is calculated and the likelihood of each outcome, the strategy tries to take the outcome with the greatest the potential. The "turn" depth of these outcomes can be controlled.
 
 # Demo
